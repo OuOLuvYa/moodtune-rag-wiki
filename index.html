@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RAG 如何做心情歌單推薦的互動式教學 HTML 簡報。">
+  <title>RAG 如何做心情歌單推薦｜教學 HTML 簡報</title>
+  <link rel="stylesheet" href="slides.css">
+</head>
+<body>
+  <a class="skip-link" href="#slide-1">跳到簡報內容</a>
+  <main id="deck" class="deck" aria-live="polite">
+    <section id="slide-1" class="slide title-slide active" data-title="封面" aria-hidden="false">
+      <div class="slide-inner">
+        <p class="kicker">MoodTune LLM Wiki 教學簡報</p>
+        <h1>RAG 如何做<br>心情歌單推薦</h1>
+        <p class="subtitle">從一句心情描述，到有來源的推薦理由</p>
+        <div class="author">中原 · 11220324 · 智運四甲 · 汪絮喬</div>
+        <div class="cover-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+    </section>
+
+    <section id="slide-2" class="slide" data-title="問題情境" aria-hidden="true">
+      <div class="slide-inner split">
+        <div>
+          <p class="kicker">01 · 問題情境</p>
+          <h2>一句心情，常常不等於一個標籤</h2>
+          <p class="big-quote">「今天腦袋很吵，想慢慢安靜下來。」</p>
+        </div>
+        <div class="plain-list">
+          <p>這句話同時包含現在的狀態和想前往的方向。</p>
+          <p>系統要理解「很吵」接近高喚醒，也要理解「安靜下來」代表希望降低能量。</p>
+          <p>RAG 讓推薦理由可以回到整理過的知識片段，而不是只靠模型臨場猜測。</p>
+        </div>
+      </div>
+      <footer>Wiki：主題總覽、心情如何表示</footer>
+    </section>
+
+    <section id="slide-3" class="slide" data-title="RAG 基本概念" aria-hidden="true">
+      <div class="slide-inner">
+        <p class="kicker">02 · 核心概念</p>
+        <h2>RAG 先找資料，再產生回答</h2>
+        <div class="flow large-flow" aria-label="RAG 四步驟">
+          <div><span>1</span><strong>查詢</strong><small>讀懂使用者的心情文字</small></div>
+          <b>→</b>
+          <div><span>2</span><strong>檢索</strong><small>找出最接近的 Wiki 片段</small></div>
+          <b>→</b>
+          <div><span>3</span><strong>生成</strong><small>把片段整理成推薦理由</small></div>
+          <b>→</b>
+          <div><span>4</span><strong>附來源</strong><small>讓理由可以回查</small></div>
+        </div>
+        <p class="note">LLM 處理語言，Wiki 提供這個專案要使用的外部知識。<span class="cite">S1</span></p>
+      </div>
+      <footer>Wiki：RAG 基本概念</footer>
+    </section>
+
+    <section id="slide-4" class="slide" data-title="Wiki 建立方式" aria-hidden="true">
+      <div class="slide-inner">
+        <p class="kicker">03 · LLM Wiki</p>
+        <h2>六篇資料如何變成可查詢的 Wiki</h2>
+        <div class="source-stack">
+          <div class="paper paper-a">RAG 原始論文<br><small>S1</small></div>
+          <div class="paper paper-b">DPR、SBERT、Faiss<br><small>S2 到 S4</small></div>
+          <div class="paper paper-c">DEAM 音樂情緒<br><small>S5</small></div>
+          <div class="paper paper-d">RAGAS 評估<br><small>S6</small></div>
+        </div>
+        <div class="ingest-line">
+          <span>摘要閱讀</span><b>→</b><span>單一概念切分</span><b>→</b><span>來源 ID 與標籤</span><b>→</b><span>回查原文</span>
+        </div>
+        <p class="note">討論後保留六個教學問題。每篇資料至少回答其中一題，才進入 Wiki。</p>
+      </div>
+      <footer>Wiki：先討論，後生成；資料如何進入 Wiki</footer>
+    </section>
+
+    <section id="slide-5" class="slide" data-title="Embedding" aria-hidden="true">
+      <div class="slide-inner split">
+        <div>
+          <p class="kicker">04 · 語意檢索</p>
+          <h2>Embedding 把句子變成可比較的向量</h2>
+          <p>意思接近的句子，在向量空間裡通常比較接近。系統可以先把 Wiki 片段編碼，再用同一個模型編碼使用者查詢。</p>
+          <p class="note">Sentence-BERT 支援用餘弦相似度比較句向量。Faiss 可在大量向量中做近鄰搜尋。<span class="cite">S3 S4</span></p>
+        </div>
+        <div class="vector-scene" aria-label="向量相似度示意">
+          <div class="query-point">腦袋很吵<br>想安靜</div>
+          <div class="match-point m1">calm<br>0.86</div>
+          <div class="match-point m2">soft<br>0.79</div>
+          <div class="match-point m3">workout<br>0.41</div>
+          <span class="axis x"></span><span class="axis y"></span>
+        </div>
+      </div>
+      <footer>Wiki：Embedding 與檢索</footer>
+    </section>
+
+    <section id="slide-6" class="slide" data-title="心情座標" aria-hidden="true">
+      <div class="slide-inner split">
+        <div>
+          <p class="kicker">05 · 心情表示</p>
+          <h2>效價與喚醒度補足單一情緒標籤</h2>
+          <p>Valence 表示感受偏正向或負向。Arousal 表示能量偏高或偏低。MoodTune 用這兩個維度描述現在的位置與想前往的方向。</p>
+          <p class="note">DEAM 使用連續的 valence 與 arousal 標註音樂情緒。<span class="cite">S5</span></p>
+        </div>
+        <div class="mini-map">
+          <div class="mq q1">焦躁</div><div class="mq q2">興奮</div>
+          <div class="mq q3">低落</div><div class="mq q4">平靜</div>
+          <span class="start-dot">現在</span><span class="target-dot">目標</span>
+          <span class="move-arrow">↘</span>
+          <b class="label-high">高喚醒</b><b class="label-low">低喚醒</b>
+        </div>
+      </div>
+      <footer>Wiki：心情如何表示</footer>
+    </section>
+
+    <section id="slide-7" class="slide" data-title="查詢示範" aria-hidden="true">
+      <div class="slide-inner">
+        <p class="kicker">06 · 查詢示範</p>
+        <h2>一次查詢如何找到三個候選片段</h2>
+        <div class="retrieval-demo">
+          <div class="demo-query">今天腦袋很吵，想慢慢安靜</div>
+          <div class="result"><strong>0.86</strong><p>低喚醒度、偏正向，適合放慢節奏的晚間情境。</p></div>
+          <div class="result"><strong>0.79</strong><p>聲音密度較低，標記為 calm、soft、unwind。</p></div>
+          <div class="result dim"><strong>0.41</strong><p>高喚醒度、強節拍，適合運動或提神。</p></div>
+        </div>
+        <p class="note">Top-k 先提供候選。內容檢查再排除雖然有相似字詞、情緒方向卻不合的片段。</p>
+      </div>
+      <footer>Wiki：Embedding 與檢索</footer>
+    </section>
+
+    <section id="slide-8" class="slide" data-title="生成規則" aria-hidden="true">
+      <div class="slide-inner split code-slide">
+        <div>
+          <p class="kicker">07 · 生成</p>
+          <h2>推薦理由只能使用取回的證據</h2>
+          <p>提示詞同時放入原始心情、Top-k 片段與輸出規則。每一首歌都要附上來源 ID。</p>
+          <p>如果片段不足，系統會先問一個澄清問題，再重新檢索。</p>
+        </div>
+        <pre><code>使用者：腦袋很吵，想安靜
+
+根據片段回答：
+• 簡短理解現在的狀態
+• 推薦 1 到 3 首歌
+• 每個理由附來源 ID
+• 只使用片段中的資訊</code></pre>
+      </div>
+      <footer>Wiki：如何產生推薦理由</footer>
+    </section>
+
+    <section id="slide-9" class="slide" data-title="Loop 與 graph" aria-hidden="true">
+      <div class="slide-inner">
+        <p class="kicker">08 · Workflow</p>
+        <h2>Loop 與 graph 設計</h2>
+        <div class="graph" aria-label="資料取得到產生簡報的流程">
+          <div class="node">取得資料<small>6 篇來源</small></div><span>→</span>
+          <div class="node">整理 Wiki<small>切分、標籤、來源 ID</small></div><span>→</span>
+          <div class="node check">檢索檢查<small>片段相關嗎？</small></div><span>→</span>
+          <div class="node">生成內容<small>教學文字與投影片</small></div><span>→</span>
+          <div class="node check">內容檢查<small>有依據、讀得懂嗎？</small></div>
+          <div class="loop-line">不通過：回到查詢改寫、Wiki 切分或投影片重寫</div>
+        </div>
+        <div class="two-notes">
+          <p><strong>重複執行</strong><br>檢索結果不相關時，改寫查詢後重搜。文字沒有來源時，刪除該句並重新生成。</p>
+          <p><strong>設計原因</strong><br>檢索錯誤會一路影響後面的推薦與簡報，因此先確認證據，再讓模型寫文字。</p>
+        </div>
+      </div>
+      <footer>Wiki：品質檢查</footer>
+    </section>
+
+    <section id="slide-10" class="slide" data-title="實際執行" aria-hidden="true">
+      <div class="slide-inner">
+        <p class="kicker">09 · 實際執行</p>
+        <h2>第一次測試發現第三名片段方向相反</h2>
+        <div class="run-log">
+          <div><span>輸入</span><p>今天腦袋很吵，想慢慢安靜。</p></div>
+          <div><span>第一次</span><p>Top-3 混入 workout 片段。它和「很吵」在字面上接近，但高喚醒度不符合目標。</p></div>
+          <div><span>修正</span><p>查詢加入「目標為低喚醒度」，並在檢索後先檢查情緒方向。</p></div>
+          <div><span>第二次</span><p>前三個片段都落在 calm、soft、unwind，生成理由能回查來源。</p></div>
+        </div>
+      </div>
+      <footer>檢查紀錄：Run 01</footer>
+    </section>
+
+    <section id="slide-11" class="slide" data-title="反思" aria-hidden="true">
+      <div class="slide-inner split reflection-slide">
+        <div>
+          <p class="kicker">10 · 反思</p>
+          <h2>最常出錯的是檢索，不是最後一段文字</h2>
+          <p class="large-text">語意相似不代表推薦方向相同。「焦躁」和「高能量」可能靠得很近，但使用者想去的是平靜。</p>
+        </div>
+        <div class="reflection-points">
+          <p><strong>檢查往前移</strong><br>從生成後才讀答案，改成 Top-k 取回後先看情緒方向。</p>
+          <p><strong>Graph 修改</strong><br>在檢索與生成之間加入 valence／arousal 一致性檢查。</p>
+          <p><strong>實際效果</strong><br>第二次測試先排除方向相反的片段，推薦理由不再需要大幅重寫。</p>
+        </div>
+      </div>
+      <footer>Wiki：品質檢查</footer>
+    </section>
+
+    <section id="slide-12" class="slide end-slide" data-title="結尾" aria-hidden="true">
+      <div class="slide-inner">
+        <p class="kicker">結論</p>
+        <h2>一份 Wiki，讓推薦理由有地方可以回查</h2>
+        <div class="end-grid">
+          <p>六篇資料整理成 RAG、向量檢索、音樂情緒與評估四組知識。</p>
+          <p>HTML 簡報沿用 Wiki 的章節與來源 ID，讓教學內容能逐段對應。</p>
+          <p>檢索後先檢查情緒方向，避免錯誤片段進入生成階段。</p>
+        </div>
+        <a class="wiki-button" href="wiki/index.html">開啟完整 LLM Wiki</a>
+        <p class="sources-small">來源：Lewis et al. (2020) · Karpukhin et al. (2020) · Reimers & Gurevych (2019) · Johnson et al. (2017) · Aljanaki et al. (2017) · Es et al. (2023)</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls" aria-label="簡報控制">
+    <button id="prev" type="button" aria-label="上一張">←</button>
+    <button id="overview" type="button" aria-label="投影片總覽">總覽</button>
+    <span id="counter" aria-live="polite">1 / 12</span>
+    <button id="fullscreen" type="button" aria-label="切換全螢幕">全螢幕</button>
+    <button id="next" type="button" aria-label="下一張">→</button>
+  </div>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+  <script src="slides.js"></script>
+</body>
+</html>
+
