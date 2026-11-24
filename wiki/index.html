@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="以心情歌單推薦為案例，整理 RAG、向量檢索、音樂情緒座標與品質檢查的 LLM Wiki。">
+  <title>MoodTune RAG Wiki</title>
+  <link rel="stylesheet" href="wiki.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到主要內容</a>
+  <header class="topbar">
+    <a class="brand" href="#overview" aria-label="回到 Wiki 首頁">
+      <span class="brand-mark">M</span>
+      <span>MoodTune RAG Wiki</span>
+    </a>
+    <div class="top-actions">
+      <label class="search-wrap">
+        <span class="sr-only">搜尋 Wiki</span>
+        <input id="search" type="search" placeholder="搜尋概念，例如 embedding" autocomplete="off">
+      </label>
+      <a class="deck-link" href="../index.html">開啟教學簡報</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Wiki 章節">
+      <p class="eyebrow">知識地圖</p>
+      <nav>
+        <a href="#overview" data-section="overview">主題總覽</a>
+        <a href="#discussion" data-section="discussion">先討論，後生成</a>
+        <a href="#rag" data-section="rag">RAG 基本概念</a>
+        <a href="#ingest" data-section="ingest">資料如何進入 Wiki</a>
+        <a href="#embedding" data-section="embedding">Embedding 與檢索</a>
+        <a href="#emotion" data-section="emotion">心情如何表示</a>
+        <a href="#generation" data-section="generation">如何產生推薦理由</a>
+        <a href="#evaluation" data-section="evaluation">品質檢查</a>
+        <a href="#sources" data-section="sources">來源與 ingest 紀錄</a>
+      </nav>
+      <div class="sidebar-note">
+        <strong>6 篇資料</strong>
+        <span>論文與官方資料集頁面</span>
+      </div>
+    </aside>
+
+    <main id="content" tabindex="-1">
+      <section id="overview" class="wiki-section hero-section" data-title="主題總覽">
+        <p class="eyebrow">LLM Wiki 主題</p>
+        <h1>RAG 如何做心情歌單推薦</h1>
+        <p class="lead">這份 Wiki 用 MoodTune 當作案例，說明系統如何把「我今天腦袋很吵，只想慢慢安靜下來」轉成可搜尋的語意，再從知識庫找出相近的歌曲描述，組成有根據的推薦理由。</p>
+        <div class="concept-line" aria-label="核心流程">
+          <span>心情文字</span><b>→</b><span>語意向量</span><b>→</b><span>相近片段</span><b>→</b><span>推薦與來源</span>
+        </div>
+        <div class="callout">
+          <p><strong>Wiki 的用途</strong></p>
+          <p>教學簡報只從這裡整理內容。每個概念都有來源 ID，方便回頭核對。</p>
+        </div>
+      </section>
+
+      <section id="discussion" class="wiki-section" data-title="先討論，後生成">
+        <p class="eyebrow">範圍設定</p>
+        <h2>先討論，後生成</h2>
+        <p>一開始先把主題拆成兩個方向：RAG 的技術流程，以及心情歌單的實際情境。討論後選擇保留六個教學問題，讓 Wiki 和簡報共用同一份結構。</p>
+        <ol class="question-list">
+          <li>使用者的心情文字要怎麼轉成可比較的資料？</li>
+          <li>歌曲資料要怎麼切分與標記？</li>
+          <li>檢索器如何找到語意接近的片段？</li>
+          <li>LLM 如何使用片段寫出推薦理由？</li>
+          <li>來源不夠時，系統要怎麼處理？</li>
+          <li>輸出前要檢查哪些項目？</li>
+        </ol>
+        <p>這個範圍直接成為後續的資料篩選條件。每一篇來源至少要能回答其中一題，才會進入 Wiki。</p>
+      </section>
+
+      <section id="rag" class="wiki-section" data-title="RAG 基本概念">
+        <p class="eyebrow">核心概念 · S1</p>
+        <h2>RAG 把外部知識帶進生成流程</h2>
+        <p>RAG 是 Retrieval-Augmented Generation 的縮寫。系統先從外部知識庫找資料，再把找到的內容和問題一起交給生成模型。Lewis 等人的原始研究把這種做法描述為參數式記憶與非參數式記憶的結合。</p>
+        <div class="compare">
+          <div>
+            <h3>LLM 內部知識</h3>
+            <p>模型訓練時學到的語言與世界知識。它能流暢回答，但不容易指出每句話來自哪份資料。</p>
+          </div>
+          <div>
+            <h3>Wiki 外部知識</h3>
+            <p>專案自行整理的文章、標籤和來源。內容可以更新，也能在輸出時附上對應依據。</p>
+          </div>
+        </div>
+        <p>在 MoodTune 裡，LLM 負責把推薦理由寫得自然；Wiki 提供歌曲情緒、使用情境與來源。兩者各自處理適合的部分。</p>
+      </section>
+
+      <section id="ingest" class="wiki-section" data-title="資料如何進入 Wiki">
+        <p class="eyebrow">知識整理 · S1 S5</p>
+        <h2>資料如何進入 Wiki</h2>
+        <p>六篇來源先經過摘要閱讀，再依照教學問題挑出相關段落。整理時保留來源 ID，並把每個段落改寫成只處理一個概念的知識單元。</p>
+        <div class="steps">
+          <article><span>01</span><h3>擷取</h3><p>記錄標題、作者、年份、網址與可回答的問題。</p></article>
+          <article><span>02</span><h3>切分</h3><p>把長內容拆成 2 到 4 個單一概念，避免一個片段混入太多主題。</p></article>
+          <article><span>03</span><h3>標記</h3><p>加入 RAG、embedding、emotion、evaluation 等標籤。</p></article>
+          <article><span>04</span><h3>核對</h3><p>把摘要回查原始來源，確認名詞與數字一致。</p></article>
+        </div>
+        <p>這次 Wiki 共 ingest 6 篇資料，來源表列在本頁最後一節。</p>
+      </section>
+
+      <section id="embedding" class="wiki-section" data-title="Embedding 與檢索">
+        <p class="eyebrow">檢索機制 · S2 S3 S4</p>
+        <h2>Embedding 讓句子可以比較語意</h2>
+        <p>Embedding 會把文字轉成一串數字。意思接近的句子，在向量空間中的方向通常也比較接近。Sentence-BERT 的做法讓句子可以先各自編碼，再用餘弦相似度快速比較。</p>
+        <div class="example-box">
+          <p class="query">查詢：「今天腦袋很吵，想慢慢安靜」</p>
+          <div class="result-row"><span>0.86</span><p>低喚醒度、偏正向；適合需要放慢節奏的晚間情境。</p></div>
+          <div class="result-row"><span>0.79</span><p>聲音密度較低，標記為 calm、soft、unwind。</p></div>
+          <div class="result-row"><span>0.41</span><p>高喚醒度、強節拍；適合運動或需要提神的情境。</p></div>
+        </div>
+        <p>檢索器取回分數最高的 Top-k 片段。Faiss 這類向量索引工具負責在大量向量中進行近鄰搜尋。分數代表語意接近程度，仍要配合內容檢查。</p>
+      </section>
+
+      <section id="emotion" class="wiki-section" data-title="心情如何表示">
+        <p class="eyebrow">音樂情緒 · S5</p>
+        <h2>心情可以放在效價與喚醒度座標上</h2>
+        <p>DEAM 研究使用 valence 和 arousal 描述音樂情緒。Valence 表示感受偏正向或負向，arousal 表示能量偏高或偏低。兩個連續維度比單一的「開心／難過」標籤更能保留情緒差異。</p>
+        <div class="emotion-map" role="img" aria-label="效價與喚醒度四象限示意">
+          <div class="axis-label top">高喚醒</div>
+          <div class="axis-label bottom">低喚醒</div>
+          <div class="axis-label left">負效價</div>
+          <div class="axis-label right">正效價</div>
+          <div class="quadrant q1">焦躁、緊繃</div>
+          <div class="quadrant q2">興奮、有衝勁</div>
+          <div class="quadrant q3">低落、疲累</div>
+          <div class="quadrant q4">平靜、放鬆</div>
+          <span class="mood-dot" title="腦袋很吵，想安靜"></span>
+        </div>
+        <p>範例查詢先落在「喚醒度偏高、效價接近中間」的位置。推薦目標則往低喚醒度移動，因此系統優先找 calm、soft、unwind 等片段。</p>
+      </section>
+
+      <section id="generation" class="wiki-section" data-title="如何產生推薦理由">
+        <p class="eyebrow">生成規則 · S1</p>
+        <h2>LLM 只使用取回的片段寫推薦理由</h2>
+        <p>檢索完成後，提示詞會包含使用者的心情、Top-k 片段和輸出格式。生成內容包含一段理解、一到三首歌曲建議，以及每首歌的推薦依據。</p>
+        <pre><code>任務：根據檢索片段推薦歌曲
+使用者：今天腦袋很吵，想慢慢安靜
+規則：
+1. 每個理由都要能在片段中找到依據
+2. 顯示來源 ID
+3. 資料不足時，提出一個澄清問題</code></pre>
+        <p>這樣做讓推薦理由和 Wiki 保持連結。使用者若想了解原因，可以沿著來源 ID 回到知識頁。</p>
+      </section>
+
+      <section id="evaluation" class="wiki-section" data-title="品質檢查">
+        <p class="eyebrow">輸出檢查 · S6</p>
+        <h2>先檢查檢索，再檢查文字</h2>
+        <p>RAGAS 把 RAG 的問題拆成不同面向。這次實作用三個問題做人工檢查，並把「檢索片段是否合適」放在生成之前。</p>
+        <table>
+          <thead><tr><th>檢查點</th><th>要回答的問題</th><th>不通過時</th></tr></thead>
+          <tbody>
+            <tr><td>檢索相關性</td><td>Top-k 片段真的在談使用者的心情需求嗎？</td><td>改寫查詢或調整標籤後重搜</td></tr>
+            <tr><td>內容忠實度</td><td>推薦理由能否在取回片段中找到依據？</td><td>刪除無依據句子並重新生成</td></tr>
+            <tr><td>回答相關性</td><td>文字有回應使用者想要的情緒方向嗎？</td><td>縮短內容，重新聚焦原始需求</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="sources" class="wiki-section" data-title="來源與 ingest 紀錄">
+        <p class="eyebrow">來源索引</p>
+        <h2>六篇已 ingest 資料</h2>
+        <div id="sourceList" class="source-list" aria-live="polite"></div>
+        <p class="source-note">資料擷取日期：2026-11-23。摘要用於課堂教學與流程展示。</p>
+      </section>
+
+      <p id="noResults" class="no-results" hidden>找不到相符內容。可以改用 RAG、向量、心情或檢查等關鍵字。</p>
+    </main>
+  </div>
+
+  <button id="backToTop" class="back-to-top" type="button" aria-label="回到頁首">↑</button>
+  <script src="wiki.js"></script>
+</body>
+</html>
+
