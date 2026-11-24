@@ -1,0 +1,57 @@
+[
+  {
+    "id": "S1",
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "authors": "Patrick Lewis et al.",
+    "year": 2020,
+    "type": "論文",
+    "url": "https://arxiv.org/abs/2005.11401",
+    "usedFor": ["RAG 定義", "參數式與非參數式記憶", "可追溯來源"]
+  },
+  {
+    "id": "S2",
+    "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+    "authors": "Vladimir Karpukhin et al.",
+    "year": 2020,
+    "type": "論文",
+    "url": "https://arxiv.org/abs/2004.04906",
+    "usedFor": ["雙編碼器", "密集檢索", "Top-k 候選"]
+  },
+  {
+    "id": "S3",
+    "title": "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks",
+    "authors": "Nils Reimers, Iryna Gurevych",
+    "year": 2019,
+    "type": "論文",
+    "url": "https://arxiv.org/abs/1908.10084",
+    "usedFor": ["句向量", "語意相似度", "餘弦相似度"]
+  },
+  {
+    "id": "S4",
+    "title": "Billion-scale similarity search with GPUs",
+    "authors": "Jeff Johnson, Matthijs Douze, Hervé Jégou",
+    "year": 2017,
+    "type": "論文",
+    "url": "https://arxiv.org/abs/1702.08734",
+    "usedFor": ["向量索引", "近鄰搜尋", "Faiss"]
+  },
+  {
+    "id": "S5",
+    "title": "Developing a benchmark for emotional analysis of music",
+    "authors": "Aljanaki, Yang, Soleymani",
+    "year": 2017,
+    "type": "同儕審查論文",
+    "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0173392",
+    "usedFor": ["效價與喚醒度", "音樂情緒座標", "DEAM 資料集"]
+  },
+  {
+    "id": "S6",
+    "title": "RAGAS: Automated Evaluation of Retrieval Augmented Generation",
+    "authors": "Shahul Es et al.",
+    "year": 2023,
+    "type": "論文",
+    "url": "https://arxiv.org/abs/2309.15217",
+    "usedFor": ["檢索相關性", "忠實度", "回答相關性"]
+  }
+]
+
